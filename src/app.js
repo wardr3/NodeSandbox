@@ -1,24 +1,28 @@
-// Import require modules
-const express = require('express');
-const http = require('http');
+const OpenAI = require('openai');
+const { OPENAI_API_KEY } = require('./config');
 
-const app = express();
-const port = 4000;
+const openai = new OpenAI({
+  apiKey: OPENAI_API_KEY,
+});
 
-// app.post('/', (req, res) => {
-//     res.writeHead(200, {'Content-Type': 'text/html'});
-//     res.end('Hello World!');
-//     console.log('log executed');
-// })
+async function listAssistants() {
+  // This line retrieves a list of all assistants previously created
+  const list = await openai.beta.assistants.list();
+  console.log(list);
+}
 
-// rework this to do the same thing but using express, not http
-http.createServer(function (req, res) {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end('Hello World!');
-}).listen(port);
+async function createAssistant() {
+  // Create an assistant with basic instructions using gpt-3.5-turbo
+  const myAssistant = await openai.beta.assistants.create({
+    instructions:
+      "You are a personal math tutor.",
+    name: "Math Tutor",
+    tools: [{ type: "code_interpreter" }],
+    model: "gpt-3.5-turbo",
+  });
 
-// // Start the server
-// app.listen(port, () => {
-//     console.log(`Server is running on port ${port}`);
-// });
+  // Output the assistant info to the console
+  console.log(myAssistant);
+}
 
+main();
